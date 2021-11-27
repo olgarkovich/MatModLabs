@@ -63,6 +63,8 @@ def generate_requests(time_max, lamba):
 
 
 def generate_p_emp(n, m, mu, v, lamba, max_time):
+    system_states = [0 for i in range(0, max_time)]
+    system_states_time = [0 for i in range(0, max_time)]
     current_time = 0
     queue = []
     smo = []
@@ -101,22 +103,29 @@ def generate_p_emp(n, m, mu, v, lamba, max_time):
             queue.remove(min_value)
 
         current_time = min_value
+        system_states_time.append(current_time)
+        system_states.append(len(smo) + len(queue))
 
     A_emp = (requests_count - unprocessed_count) / max_time
     p_emp_n = [p / max_time for p in p_emp]
 
+    plt.plot(list(system_states_time), system_states)
+    plt.xlabel("time")
+    plt.ylabel("state")
+    plt.show()
+
     return p_emp_n, A_emp
 
 
-def main():
-    n = 5  # число каналов
-    lamba = 25  # интенсивность поступления
-    m = 10  # места в очереди
-    mu = 2  # интенсивность обслуживания заявок
+def main(n, m, lamba, mu):
+    # n = 5  # число каналов
+    # lamba = 25  # интенсивность поступления
+    # m = 10  # места в очереди
+    # mu = 2  # интенсивность обслуживания заявок
     ro = lamba / mu  # коэф загрузки
     v = 6  # интенсивность ухода потока заявок
     betta = v / mu
-    max_time = 10
+    max_time = 100
 
     # финальные вероятности состояний
     p = generate_p(n, m, ro, betta)
@@ -174,8 +183,27 @@ def main():
     plt.plot(list(range(n + m + 1)), p)
     plt.plot(list(range(n + m + 1)), p_emp)
     plt.legend(['theor', 'emp'])
+    plt.title(f"n = {n}, m = {m}, lamba = {lamba}, mu = {mu}")
     plt.show()
 
 
 if __name__ == '__main__':
-    main()
+    print("CHANGE N")
+    main(2, 4, 8, 2)
+    main(4, 4, 8, 2)
+    main(8, 4, 8, 2)
+
+    print("CHANGE M")
+    main(2, 4, 8, 2)
+    main(2, 8, 8, 2)
+    main(2, 16, 8, 2)
+
+    print("CHANGE LAMBA")
+    main(2, 4, 4, 2)
+    main(2, 4, 8, 2)
+    main(2, 4, 16, 2)
+
+    print("CHANGE MU")
+    main(2, 4, 8, 2)
+    main(2, 4, 8, 4)
+    main(2, 4, 8, 8)
